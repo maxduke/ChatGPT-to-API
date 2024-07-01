@@ -3,6 +3,7 @@ package main
 import (
 	chatgpt_request_converter "freechatgpt/conversion/requests/chatgpt"
 	chatgpt "freechatgpt/internal/chatgpt"
+	"fmt"
 	"freechatgpt/internal/tokens"
 	official_types "freechatgpt/typings/official"
 	"os"
@@ -115,6 +116,18 @@ func nightmare(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "unable to check chat requirement"})
 		return
 	}
+	for i := 0; i < chatgpt.PowRetryTimes; i++ {		
+		if chat_require.Proof.Required && chat_require.Proof.Difficulty <= chatgpt.PowMaxDifficulty {
+			println(fmt.Sprintf("Proof of work difficulty too high: %s. Retrying... %d/%d", chat_require.Proof.Difficulty, i + 1, chatgpt.PowRetryTimes))
+			chat_require, _ = chatgpt.CheckRequire(&secret, deviceId, proxy_url)
+			if chat_require == nil {
+				c.JSON(500, gin.H{"error": "unable to check chat requirement"})
+				return
+			}
+		} else {
+			break
+		}
+	}
 	var proofToken string
 	if chat_require.Proof.Required {
 		proofToken = chatgpt.CalcProofToken(chat_require, proxy_url)
@@ -159,6 +172,22 @@ func nightmare(c *gin.Context) {
 		translated_request.ConversationID = continue_info.ConversationID
 		translated_request.ParentMessageID = continue_info.ParentID
 		chat_require, _ = chatgpt.CheckRequire(&secret, deviceId, proxy_url)
+		if chat_require == nil {
+			c.JSON(500, gin.H{"error": "unable to check chat requirement"})
+			return
+		}
+		for i := 0; i < chatgpt.PowRetryTimes; i++ {		
+			if chat_require.Proof.Required && chat_require.Proof.Difficulty <= chatgpt.PowMaxDifficulty {
+				println(fmt.Sprintf("Proof of work difficulty too high: %s. Retrying... %d/%d", chat_require.Proof.Difficulty, i + 1, chatgpt.PowRetryTimes))
+				chat_require, _ = chatgpt.CheckRequire(&secret, deviceId, proxy_url)
+				if chat_require == nil {
+					c.JSON(500, gin.H{"error": "unable to check chat requirement"})
+					return
+				}
+			} else {
+				break
+			}
+		}
 		if chat_require.Proof.Required {
 			proofToken = chatgpt.CalcProofToken(chat_require, proxy_url)
 		}
@@ -249,6 +278,18 @@ func tts(c *gin.Context) {
 	if chat_require == nil {
 		c.JSON(500, gin.H{"error": "unable to check chat requirement"})
 		return
+	}
+	for i := 0; i < chatgpt.PowRetryTimes; i++ {		
+		if chat_require.Proof.Required && chat_require.Proof.Difficulty <= chatgpt.PowMaxDifficulty {
+			println(fmt.Sprintf("Proof of work difficulty too high: %s. Retrying... %d/%d", chat_require.Proof.Difficulty, i + 1, chatgpt.PowRetryTimes))
+			chat_require, _ = chatgpt.CheckRequire(&secret, deviceId, proxy_url)
+			if chat_require == nil {
+				c.JSON(500, gin.H{"error": "unable to check chat requirement"})
+				return
+			}
+		} else {
+			break
+		}
 	}
 	var proofToken string
 	if chat_require.Proof.Required {
