@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
@@ -39,7 +40,7 @@ func init() {
 		if err != nil {
 			println(fmt.Sprintf("Error converting %s to integer: %v", envIntervalDays, err))
 		} else {
-			interval = interval * intValue
+			interval = interval * time.Duration(intValue)
 			println(fmt.Sprintf("INTERVAL_DAYS is set to : %d", interval))
 		}
 	}
