@@ -12,13 +12,12 @@ var gptsRegexp = regexp.MustCompile(`-gizmo-g-(\w+)`)
 
 func ConvertAPIRequest(api_request official_types.APIRequest, account string, secret *tokens.Secret, deviceId string, proxy string) chatgpt_types.ChatGPTRequest {
 	chatgpt_request := chatgpt_types.NewChatGPTRequest()
-	if strings.HasPrefix(api_request.Model, "gpt-3.5") {
-		chatgpt_request.Model = "text-davinci-002-render-sha"
+	if strings.HasPrefix(api_request.Model, "gpt-4o-mini") || strings.HasPrefix(api_request.Model, "gpt-3.5") {
+		chatgpt_request.Model = "gpt-4o-mini"
+	} else if strings.HasPrefix(api_request.Model, "gpt-4o") {
+		chatgpt_request.Model = "gpt-4o"
 	} else if strings.HasPrefix(api_request.Model, "gpt-4") {
 		chatgpt_request.Model = "gpt-4"
-		if strings.HasPrefix(api_request.Model, "gpt-4o") {
-			chatgpt_request.Model = "gpt-4o"
-		}
 	}
 	matches := gptsRegexp.FindStringSubmatch(api_request.Model)
 	if len(matches) == 2 {
