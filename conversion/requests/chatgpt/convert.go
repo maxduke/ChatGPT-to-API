@@ -18,10 +18,10 @@ func ConvertAPIRequest(api_request official_types.APIRequest, account string, se
 		chatgpt_request.Model = "gpt-4o"
 	} else if strings.HasPrefix(api_request.Model, "gpt-4") {
 		chatgpt_request.Model = "gpt-4"
-	} else if strings.HasPrefix(api_request.Model, "o1-preview") {
-		chatgpt_request.Model = "o1-preview"
 	} else if strings.HasPrefix(api_request.Model, "o1-mini") {
 		chatgpt_request.Model = "o1-mini"
+	} else if strings.HasPrefix(api_request.Model, "o1") {
+		chatgpt_request.Model = "o1"
 	}
 	matches := gptsRegexp.FindStringSubmatch(api_request.Model)
 	if len(matches) == 2 {
