@@ -41,7 +41,7 @@ func init() {
 			println(fmt.Sprintf("Error converting %s to integer: %v", envIntervalDays, err))
 		} else {
 			interval = interval * time.Duration(intValue)
-			println(fmt.Sprintf("INTERVAL_DAYS is set to : %d", interval))
+			println(fmt.Sprintf("INTERVAL_DAYS is set to : %d", intValue))
 		}
 	}
 }
