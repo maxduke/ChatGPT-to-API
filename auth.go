@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
@@ -20,7 +21,7 @@ var accounts map[string]AccountInfo
 
 var validAccounts []string
 
-const interval = time.Hour * 24
+var interval = time.Hour * 24
 
 type AccountInfo struct {
 	Password string `json:"password"`
@@ -30,6 +31,19 @@ type AccountInfo struct {
 type TokenExp struct {
 	Exp int64 `json:"exp"`
 	Iat int64 `json:"iat"`
+}
+
+func init() {
+	envIntervalDays := os.Getenv("INTERVAL_DAYS")
+	if envIntervalDays != "" {
+		intValue, err := strconv.Atoi(envIntervalDays)
+		if err != nil {
+			println(fmt.Sprintf("Error converting %s to integer: %v", envIntervalDays, err))
+		} else {
+			interval = interval * time.Duration(intValue)
+			println(fmt.Sprintf("INTERVAL_DAYS is set to : %d", interval))
+		}
+	}
 }
 
 func getTokenExpire(tokenstring string) (time.Time, error) {
